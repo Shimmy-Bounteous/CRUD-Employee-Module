@@ -2,11 +2,12 @@ const mongoose = require('mongoose');
 
 async function connectDB() {
   try {
-    await mongoose.connect('mongodb+srv://shimmyroyd:FRDa1YUB4F0Gkl54@bounteouscluster.opt1hve.mongodb.net/?retryWrites=true&w=majority', {
+    await mongoose.connect(process.env.DB_URL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+    //   the below properties are depricated
     //   useFindAndModify: false,
-    //   useCreateIndex: true
+    //   useCreateIndex: true      
     });
     console.log('Connected to MongoDB Atlas');
   } catch (error) {

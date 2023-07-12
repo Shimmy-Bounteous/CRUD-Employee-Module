@@ -11,7 +11,7 @@ const {
 router.post('/', addEmployee);
 router.get('/:eid', getEmployee);
 router.get('/', getAllEmployees);
-router.put('/:id', updateEmployee);
-router.delete('/:id', deleteEmployee);
+router.patch('/:eid', updateEmployee);
+router.delete('/:eid', deleteEmployee);
 
 module.exports = router;

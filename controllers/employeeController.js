@@ -27,6 +27,7 @@ async function getAllEmployees(req, res) {
       const employees = await Employee.find();
       res.json({ success: true, data: employees });
     } catch (error) {
+      // console.log(error.message);
       res.status(500).json({ success: false, error: error.message });
     }
   }
@@ -34,8 +35,8 @@ async function getAllEmployees(req, res) {
 // Update employee details
 async function updateEmployee(req, res) {
   try {
-    const employee = await Employee.findByIdAndUpdate(
-      req.params.id,
+    const employee = await Employee.findOneAndUpdate(
+      {"eid": req.params.eid},
       req.body,
       { new: true }
     );
@@ -48,8 +49,11 @@ async function updateEmployee(req, res) {
 // Delete an employee
 async function deleteEmployee(req, res) {
   try {
-    await Employee.findByIdAndRemove(req.params.id);
-    res.status(202).json({ success: true, message: 'Employee deleted successfully' });
+    const data = await Employee.findOneAndDelete({"eid": req.params.eid});
+    if(data !== null)
+      res.status(202).json({ success: true, message: 'Employee deleted successfully' });
+    else
+      res.status(400).json({success:false, message: "Employee not found"});
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
