@@ -8,10 +8,10 @@ const {
   deleteEmployee
 } = require('../controllers/employeeController');
 
-router.post('/', addEmployee);
-router.get('/:eid', getEmployee);
-router.get('/', getAllEmployees);
-router.patch('/:eid', updateEmployee);
-router.delete('/:eid', deleteEmployee);
+router.post('/add', addEmployee);
+router.get('/get/:eid', getEmployee);
+router.get('/get', getAllEmployees);
+router.patch('/update/:eid', updateEmployee);
+router.delete('/delete/:eid', deleteEmployee);
 
 module.exports = router;
