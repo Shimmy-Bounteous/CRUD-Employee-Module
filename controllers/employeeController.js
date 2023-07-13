@@ -7,6 +7,7 @@ async function addEmployee(req, res) {
     const employee = await Employee.create(req.body);
     res.status(201).json({ success: true, data: employee });
   } catch (error) {
+    // console.log(error.message);
     res.status(500).json({ success: false, error: error.message });
   }
 }
@@ -26,9 +27,12 @@ async function getEmployee(req, res) {
     console.log(employee);
     if(employee.length !== 0)
       res.json({ success: true, data: employee });
-    else
+    else{
+      // console.log('Invalid Employee ID');
       res.status(400).json({ success: false, message: 'Invalid Employee ID'});
+    }
   } catch (error) {
+    // console.log(error.message);
     res.status(500).json({ success: false, error: error.message });
   }
 }
@@ -55,9 +59,12 @@ async function updateEmployee(req, res) {
     console.log(employee);
     if(employee !== null)
       res.status(202).json({ success: true, data: employee });
-    else 
+    else{
+      // console.log('Invalid Employee ID');
       res.status(400).json({ success: false, message: 'Invalid Employee ID'})
+    } 
   } catch (error) {
+    // console.log(error.message);
     res.status(500).json({ success: false, error: error.message });
   }
 }
@@ -68,9 +75,12 @@ async function deleteEmployee(req, res) {
     const employee = await Employee.findOneAndDelete({"eid": req.params.eid});
     if(employee !== null)
       res.status(202).json({ success: true, message: 'Employee deleted successfully' });
-    else
+    else{
+      // console.log('Employee not found');
       res.status(400).json({success:false, message: "Employee not found"});
+    }
   } catch (error) {
+    // console.log(error.message);
     res.status(500).json({ success: false, error: error.message });
   }
 }
