@@ -1,4 +1,5 @@
 const Employee = require('../models/employee');
+const mongoose = require('mongoose')
 
 // Add employee details to the database
 async function addEmployee(req, res) {
@@ -13,9 +14,20 @@ async function addEmployee(req, res) {
 // Get employee details
 async function getEmployee(req, res) {
   try {
+    // -- Use the below template for when using an id field of MongoDB ObjectID Type
+    // if(!mongoose.Types.ObjectId.isValid(req.params.eid)){
+    //   res.status(400).json({success: false, message: 'Invalid Employee ID'})
+    // }
+    // else{
+    //    // try block code  
+    // }
     const eid = req.params.eid;
-    const employees = await Employee.find({"eid": eid});
-    res.json({ success: true, data: employees });
+    const employee = await Employee.find({"eid": eid});
+    console.log(employee);
+    if(employee.length !== 0)
+      res.json({ success: true, data: employee });
+    else
+      res.status(400).json({ success: false, message: 'Invalid Employee ID'});
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -40,7 +52,11 @@ async function updateEmployee(req, res) {
       req.body,
       { new: true }
     );
-    res.status(202).json({ success: true, data: employee });
+    console.log(employee);
+    if(employee !== null)
+      res.status(202).json({ success: true, data: employee });
+    else 
+      res.status(400).json({ success: false, message: 'Invalid Employee ID'})
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -49,8 +65,8 @@ async function updateEmployee(req, res) {
 // Delete an employee
 async function deleteEmployee(req, res) {
   try {
-    const data = await Employee.findOneAndDelete({"eid": req.params.eid});
-    if(data !== null)
+    const employee = await Employee.findOneAndDelete({"eid": req.params.eid});
+    if(employee !== null)
       res.status(202).json({ success: true, message: 'Employee deleted successfully' });
     else
       res.status(400).json({success:false, message: "Employee not found"});
