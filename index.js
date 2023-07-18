@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const connectDB = require('./config/db');
 const employeeRoutes = require('./routes/employeeRoutes');
+const userRoutes = require('./routes/userRoutes');
 const { populateInitialData } = require('./seed');
 
 const app = express();
@@ -14,7 +15,7 @@ app.use(express.json());
 
 //Middleware to log request to before it's handled (i.e. sent to the actual endpoint) 
 app.use('/', (req, res, next)=>{
-  console.log(`Request Method: ${req.method}\n`);
+  console.log(`\nRequest Method: ${req.method} \t Request URL: ${req.url}`);
   if(req.method === "PATCH" || req.method === "POST")
     console.log(`Request Body:\n ${req.body}`);
   next();
@@ -22,6 +23,7 @@ app.use('/', (req, res, next)=>{
 
 // Routes
 app.use('/employees', employeeRoutes);
+app.use('/users', userRoutes);
 
 // Populating initial data before starting the server
 populateInitialData().then(() => {

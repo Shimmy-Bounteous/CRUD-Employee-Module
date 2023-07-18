@@ -6,7 +6,8 @@ const employeeSchema = new mongoose.Schema({
   age: { type: Number, required: true },
   gender: { type: String, required: true },
   skills: { type: [String], required: false },
-  designation: { type: String, required: true }
+  designation: { type: String, required: true },
+  userCredentialsId: {type: mongoose.Schema.Types.ObjectId, ref: 'UserCredentials'}
 });
 
 const Employee = mongoose.model('Employee', employeeSchema);
