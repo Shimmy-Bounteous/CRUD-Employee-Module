@@ -43,11 +43,47 @@ async function signUp(req, res){
 // Get all users credentials
 async function getAllUsers(req, res) {
     try {
-      const users = await UserCredentials.find();
-      res.json({ success: true, data: users });
+        const users = await UserCredentials.find();
+        res.json({ success: true, data: users });
     } catch (error) {
-      // console.log(error.message);
-      res.status(500).json({ success: false, error: error.message });
+        // console.log(error.message);
+        res.status(500).json({ success: false, error: error.message });
+    }
+}
+
+// login user
+async function login(req, res){
+    try{
+        const {email, password} = req.body;
+        
+        // Check if user exits
+        const user = await UserCredentials.findOne({"email": email});
+        if(!user){
+            return res.status(401).json({success: false, message: 'Invalid User Credentials'});
+        }
+        else{
+            // validate password
+            bcrypt.compare(password, user.password, (err, hash) => {
+                if(err){
+                    return res.status(401).json({success: false, message: 'Invalid User Credentials'});
+                }
+                else{
+                    // generate JWT
+                    const token = jwt.sign(
+                        {
+                            id: user.userId,
+                            email: email
+                        }, 
+                        process.env.JWT_KEY, 
+                        {expiresIn: '1h'}
+                    );
+                    res.json({success: true, message: 'Login Successfull', token});
+                }
+            });
+        }
+    }
+    catch(error){
+        res.status(500).json({success: false, error: error.message});
     }
 }
 
@@ -71,6 +107,7 @@ async function deleteUser(req, res) {
 
 module.exports = {
     signUp,
+    login,
     getAllUsers,
     deleteUser
 };
