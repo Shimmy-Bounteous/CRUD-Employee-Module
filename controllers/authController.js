@@ -8,6 +8,10 @@ async function signUp(req, res){
     try{
         const {email, password} = req.body;
 
+        // regex to validate email
+        let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+        if(!emailRegex.test(email))throw Error("Invalid email");
+
         // check if existing user
         const existingUser = await UserCredentials.findOne({email});
         if(existingUser){
@@ -55,6 +59,10 @@ async function getAllUsers(req, res) {
 async function login(req, res){
     try{
         const {email, password} = req.body;
+
+        // regex to validate email
+        let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+        if(!emailRegex.test(email))throw Error("Invalid email");
         
         // Check if user exits
         const user = await UserCredentials.findOne({"email": email});
