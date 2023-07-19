@@ -4,6 +4,8 @@ const connectDB = require('./config/db');
 const employeeRoutes = require('./routes/employeeRoutes');
 const userRoutes = require('./routes/userRoutes');
 const { populateInitialData } = require('./seed');
+const { logRequest } = require('./middleware/logRequest');
+const { validatePassword } = require('./middleware/passwordValidator');
 
 const app = express();
 
@@ -14,13 +16,10 @@ connectDB();
 app.use(express.json());
 
 //Middleware to log request to before it's handled (i.e. sent to the actual endpoint) 
-app.use('/', (req, res, next)=>{
-  console.log(`\nRequest Method: ${req.method} \t Request URL: ${req.url}`);
-  if(req.method === "PATCH" || req.method === "POST")
-    console.log(`Request Body:`);
-    console.log(req.body);
-  next();
-});
+app.use('/', logRequest);
+
+//Middleware to validate password 
+app.use('/users/signUp', validatePassword);
 
 // Routes
 app.use('/employees', employeeRoutes);
