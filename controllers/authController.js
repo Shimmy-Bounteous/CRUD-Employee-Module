@@ -85,6 +85,7 @@ async function login(req, res){
                         process.env.JWT_KEY, 
                         {expiresIn: '1h'}
                     );
+                    console.log();
                     res.json({success: true, message: 'Login Successfull', token});
                 }
             });
