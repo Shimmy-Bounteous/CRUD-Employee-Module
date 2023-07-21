@@ -6,14 +6,17 @@ const userRoutes = require('./routes/userRoutes');
 const { populateInitialData } = require('./seed');
 const { logRequest } = require('./middleware/logRequest');
 const { validatePassword } = require('./middleware/passwordValidator');
-
 const app = express();
+const cookieParser = require('cookie-parser');
 
 // Connect to MongoDB
 connectDB();
 
 // Middleware to parse body to JSON
 app.use(express.json());
+
+// To parse the cookies when the refresh endpoint is hit
+app.use(cookieParser());
 
 //Middleware to log request to before it's handled (i.e. sent to the actual endpoint) 
 app.use('/', logRequest);

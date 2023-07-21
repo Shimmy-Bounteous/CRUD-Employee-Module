@@ -76,17 +76,33 @@ async function login(req, res){
                     return res.status(401).json({success: false, message: 'Invalid User Credentials'});
                 }
                 else{
-                    // generate JWT
-                    const token = jwt.sign(
+                    // Generating access token
+                    const accessToken = jwt.sign(
                         {
-                            id: user.userId,
                             email: email
                         }, 
                         process.env.JWT_KEY, 
-                        {expiresIn: '1h'}
+                        {expiresIn: 30}
                     );
-                    console.log();
-                    res.json({success: true, message: 'Login Successfull', token});
+
+                    // Generating refresh token
+                    const refreshToken = jwt.sign(
+                        {
+                            email: email
+                        }, 
+                        process.env.JWT_KEY, 
+                        {expiresIn: '2h'}
+                    );
+                    
+                    // Setting refresh token in response cookie
+                    res.cookie('jwt', refreshToken, 
+                    {
+                        httpOnly: true,
+                        secure: true
+                    });
+
+                    // console.log();
+                    res.status(201).json({success: true, message: 'Login Successfull', accessToken});
                 }
             });
         }
@@ -114,9 +130,43 @@ async function deleteUser(req, res) {
     }
 }
 
+// Generate new access token upon refresh token's expiry
+async function refresh(req, res) {
+    try{
+        if(req.cookies?.jwt){
+            const refreshToken = req.cookies.jwt;
+    
+            jwt.verify(refreshToken, process.env.JWT_KEY, (err, decoded) => {
+                if(err){
+                    return res.status(403).json({success: false, message: 'Invalid Refresh Token'});
+                }
+        
+                // Generating access token
+                const accessToken = jwt.sign(
+                    {
+                        email: decoded.email
+                    }, 
+                    process.env.JWT_KEY, 
+                    {expiresIn: 30}
+                );;
+    
+                 return res.status(201).json({success: true, accessToken});
+            })
+        }
+        else{
+            return res.status(403).json({success: false, message: 'Unauthorized'});
+        }
+    }
+    catch(error){
+        res.status(500).json({success: false, error: error.message});    
+    }
+} 
+
+
 module.exports = {
     signUp,
     login,
     getAllUsers,
-    deleteUser
+    deleteUser,
+    refresh
 };
