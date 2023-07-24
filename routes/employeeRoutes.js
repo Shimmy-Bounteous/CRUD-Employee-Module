@@ -12,7 +12,7 @@ const {
   deleteEmployee
 } = require('../controllers/employeeController');
 
-router.post('/add', addEmployee);
+router.post('/add', verifyToken, addEmployee);
 router.get('/get/:eid', verifyToken, getEmployee);
 router.get('/get', verifyToken, getAllEmployees);
 router.patch('/update/:eid', verifyToken, updateEmployee);

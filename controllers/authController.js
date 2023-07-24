@@ -82,7 +82,7 @@ async function login(req, res){
                             email: email
                         }, 
                         process.env.JWT_KEY, 
-                        {expiresIn: 30}
+                        {expiresIn: 60}
                     );
 
                     // Generating refresh token
@@ -133,7 +133,11 @@ async function deleteUser(req, res) {
 // Generate new access token upon refresh token's expiry
 async function refresh(req, res) {
     try{
-        if(req.cookies?.jwt){
+        // If cookies and refresh token doesn't exist
+        if(!req.cookies?.jwt){
+            return res.status(403).json({success: false, message: 'Unauthorized'});
+        }
+        else{
             const refreshToken = req.cookies.jwt;
     
             jwt.verify(refreshToken, process.env.JWT_KEY, (err, decoded) => {
@@ -147,14 +151,11 @@ async function refresh(req, res) {
                         email: decoded.email
                     }, 
                     process.env.JWT_KEY, 
-                    {expiresIn: 30}
+                    {expiresIn: 60}
                 );;
     
                  return res.status(201).json({success: true, accessToken});
             })
-        }
-        else{
-            return res.status(403).json({success: false, message: 'Unauthorized'});
         }
     }
     catch(error){
