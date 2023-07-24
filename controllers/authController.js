@@ -137,26 +137,25 @@ async function refresh(req, res) {
         if (!req.cookies?.jwt) {
             return res.status(403).json({ success: false, message: 'Unauthorized' });
         }
-        else {
-            const refreshToken = req.cookies.jwt;
+        const refreshToken = req.cookies.jwt;
 
-            jwt.verify(refreshToken, process.env.JWT_KEY, (err, decoded) => {
-                if (err) {
-                    return res.status(403).json({ success: false, message: 'Invalid Refresh Token' });
-                }
+        jwt.verify(refreshToken, process.env.JWT_KEY, (err, decoded) => {
+            if (err) {
+                return res.status(403).json({ success: false, message: 'Invalid Refresh Token' });
+            }
 
-                // Generating access token
-                const accessToken = jwt.sign(
-                    {
-                        email: decoded.email
-                    },
-                    process.env.JWT_KEY,
-                    { expiresIn: 60 }
-                );;
+            // Generating access token
+            const accessToken = jwt.sign(
+                {
+                    email: decoded.email
+                },
+                process.env.JWT_KEY,
+                { expiresIn: 60 }
+            );;
 
-                return res.status(201).json({ success: true, accessToken });
-            })
-        }
+            return res.status(201).json({ success: true, accessToken });
+        })
+
     }
     catch (error) {
         res.status(500).json({ success: false, error: error.message });
