@@ -5,11 +5,11 @@ const mongoose = require('mongoose')
 async function addEmployee(req, res) {
   try {
     // Checking if existing employee
-    const existingEmployee = await Employee.findOne({"name": req.body.name});
-    if(existingEmployee){
-      res.status(409).json({success: false, message: "Employee already registered with given email id"});
+    const existingEmployee = await Employee.findOne({ "name": req.body.name });
+    if (existingEmployee) {
+      res.status(409).json({ success: false, message: "Employee already registered with given email id" });
     }
-    else{
+    else {
       const employee = await Employee.create(req.body);
       res.status(201).json({ success: true, data: employee });
     }
@@ -30,13 +30,13 @@ async function getEmployee(req, res) {
     //    // try block code  
     // }
     const eid = req.params.eid;
-    const employee = await Employee.find({"eid": eid});
+    const employee = await Employee.find({ "eid": eid });
     console.log(employee);
-    if(employee.length !== 0)
+    if (employee.length !== 0)
       res.json({ success: true, data: employee });
-    else{
+    else {
       // console.log('Invalid Employee ID');
-      res.status(400).json({ success: false, message: 'Invalid Employee ID'});
+      res.status(400).json({ success: false, message: 'Invalid Employee ID' });
     }
   } catch (error) {
     // console.log(error.message);
@@ -46,30 +46,30 @@ async function getEmployee(req, res) {
 
 // Get all employee details
 async function getAllEmployees(req, res) {
-    try {
-      const employees = await Employee.find();
-      res.json({ success: true, data: employees });
-    } catch (error) {
-      // console.log(error.message);
-      res.status(500).json({ success: false, error: error.message });
-    }
+  try {
+    const employees = await Employee.find();
+    res.json({ success: true, data: employees });
+  } catch (error) {
+    // console.log(error.message);
+    res.status(500).json({ success: false, error: error.message });
   }
+}
 
 // Update employee details
 async function updateEmployee(req, res) {
   try {
     const employee = await Employee.findOneAndUpdate(
-      {"eid": req.params.eid},
+      { "eid": req.params.eid },
       req.body,
       { new: true }
     );
     console.log(employee);
-    if(employee !== null)
+    if (employee !== null)
       res.status(202).json({ success: true, data: employee });
-    else{
+    else {
       // console.log('Invalid Employee ID');
-      res.status(400).json({ success: false, message: 'Invalid Employee ID'})
-    } 
+      res.status(400).json({ success: false, message: 'Invalid Employee ID' })
+    }
   } catch (error) {
     // console.log(error.message);
     res.status(500).json({ success: false, error: error.message });
@@ -79,12 +79,12 @@ async function updateEmployee(req, res) {
 // Delete an employee
 async function deleteEmployee(req, res) {
   try {
-    const employee = await Employee.findOneAndDelete({"eid": req.params.eid});
-    if(employee !== null)
+    const employee = await Employee.findOneAndDelete({ "eid": req.params.eid });
+    if (employee !== null)
       res.status(202).json({ success: true, message: 'Employee deleted successfully' });
-    else{
+    else {
       // console.log('Employee not found');
-      res.status(400).json({success:false, message: "Employee not found"});
+      res.status(400).json({ success: false, message: "Employee not found" });
     }
   } catch (error) {
     // console.log(error.message);

@@ -4,26 +4,26 @@ const UserCredentials = require('../models/userCredentials');
 const mongoose = require('mongoose');
 
 // Sign-Up a new employee
-async function signUp(req, res){
-    try{
-        const {email, password} = req.body;
+async function signUp(req, res) {
+    try {
+        const { email, password } = req.body;
 
         // regex to validate email
         let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
-        if(!emailRegex.test(email))throw Error("Invalid email");
+        if (!emailRegex.test(email)) throw Error("Invalid email");
 
         // check if existing user
-        const existingUser = await UserCredentials.findOne({email});
-        if(existingUser){
-            return res.status(409).json({ success: false, message: 'Email already exists'});
+        const existingUser = await UserCredentials.findOne({ email });
+        if (existingUser) {
+            return res.status(409).json({ success: false, message: 'Email already exists' });
         }
-        else{
+        else {
             // encrpyt the password
             bcrypt.hash(password, 10, async (err, hashedPassword) => {
-                if(err){
+                if (err) {
                     return res.status(500).json({ error: err.message });
                 }
-                else{
+                else {
                     // creating user
                     const newUser = await UserCredentials.create({
                         _id: new mongoose.Types.ObjectId(),
@@ -31,15 +31,15 @@ async function signUp(req, res){
                         password: hashedPassword
                     });
                     console.log(newUser);
-                    res.status(201).json({success: true, message: 'User created'});
+                    res.status(201).json({ success: true, message: 'User created' });
                 }
             });
-    
+
         }
 
     }
-    catch(error){
-        res.status(500).json({success: false, error: error.message});
+    catch (error) {
+        res.status(500).json({ success: false, error: error.message });
     }
 
 }
@@ -56,112 +56,112 @@ async function getAllUsers(req, res) {
 }
 
 // login user
-async function login(req, res){
-    try{
-        const {email, password} = req.body;
+async function login(req, res) {
+    try {
+        const { email, password } = req.body;
 
         // regex to validate email
         let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
-        if(!emailRegex.test(email))throw Error("Invalid email");
-        
+        if (!emailRegex.test(email)) throw Error("Invalid email");
+
         // Check if user exits
-        const user = await UserCredentials.findOne({"email": email});
-        if(!user){
-            return res.status(401).json({success: false, message: 'Invalid User Credentials'});
+        const user = await UserCredentials.findOne({ "email": email });
+        if (!user) {
+            return res.status(401).json({ success: false, message: 'Invalid User Credentials' });
         }
-        else{
+        else {
             // validate password
             bcrypt.compare(password, user.password, (err, hash) => {
-                if(err){
-                    return res.status(401).json({success: false, message: 'Invalid User Credentials'});
+                if (err) {
+                    return res.status(401).json({ success: false, message: 'Invalid User Credentials' });
                 }
-                else{
+                else {
                     // Generating access token
                     const accessToken = jwt.sign(
                         {
                             email: email
-                        }, 
-                        process.env.JWT_KEY, 
-                        {expiresIn: 60}
+                        },
+                        process.env.JWT_KEY,
+                        { expiresIn: 60 }
                     );
 
                     // Generating refresh token
                     const refreshToken = jwt.sign(
                         {
                             email: email
-                        }, 
-                        process.env.JWT_KEY, 
-                        {expiresIn: '2h'}
+                        },
+                        process.env.JWT_KEY,
+                        { expiresIn: '2h' }
                     );
-                    
+
                     // Setting refresh token in response cookie
-                    res.cookie('jwt', refreshToken, 
-                    {
-                        httpOnly: true,
-                        secure: true
-                    });
+                    res.cookie('jwt', refreshToken,
+                        {
+                            httpOnly: true,
+                            secure: true
+                        });
 
                     // console.log();
-                    res.status(201).json({success: true, message: 'Login Successfull', accessToken});
+                    res.status(201).json({ success: true, message: 'Login Successfull', accessToken });
                 }
             });
         }
     }
-    catch(error){
-        res.status(500).json({success: false, error: error.message});
+    catch (error) {
+        res.status(500).json({ success: false, error: error.message });
     }
 }
 
 // delete user credentials
 async function deleteUser(req, res) {
-    try{
-        const user = await UserCredentials.findOneAndDelete({"_id": req.params.userId});
-        if(user !== null){
+    try {
+        const user = await UserCredentials.findOneAndDelete({ "_id": req.params.userId });
+        if (user !== null) {
             console.log(user);
             res.status(202).json({ success: true, message: 'User deleted successfully' });
         }
-        else{
+        else {
             console.log('User not found');
-            res.status(400).json({success:false, message: "User not found"});
+            res.status(400).json({ success: false, message: "User not found" });
         }
     }
-    catch(error){
-        res.status(500).json({success: false, error: error.message});
+    catch (error) {
+        res.status(500).json({ success: false, error: error.message });
     }
 }
 
 // Generate new access token upon refresh token's expiry
 async function refresh(req, res) {
-    try{
+    try {
         // If cookies and refresh token doesn't exist
-        if(!req.cookies?.jwt){
-            return res.status(403).json({success: false, message: 'Unauthorized'});
+        if (!req.cookies?.jwt) {
+            return res.status(403).json({ success: false, message: 'Unauthorized' });
         }
-        else{
+        else {
             const refreshToken = req.cookies.jwt;
-    
+
             jwt.verify(refreshToken, process.env.JWT_KEY, (err, decoded) => {
-                if(err){
-                    return res.status(403).json({success: false, message: 'Invalid Refresh Token'});
+                if (err) {
+                    return res.status(403).json({ success: false, message: 'Invalid Refresh Token' });
                 }
-        
+
                 // Generating access token
                 const accessToken = jwt.sign(
                     {
                         email: decoded.email
-                    }, 
-                    process.env.JWT_KEY, 
-                    {expiresIn: 60}
+                    },
+                    process.env.JWT_KEY,
+                    { expiresIn: 60 }
                 );;
-    
-                 return res.status(201).json({success: true, accessToken});
+
+                return res.status(201).json({ success: true, accessToken });
             })
         }
     }
-    catch(error){
-        res.status(500).json({success: false, error: error.message});    
+    catch (error) {
+        res.status(500).json({ success: false, error: error.message });
     }
-} 
+}
 
 
 module.exports = {
