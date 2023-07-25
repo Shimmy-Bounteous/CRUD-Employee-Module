@@ -82,7 +82,7 @@ async function login(req, res) {
                             email: email
                         },
                         process.env.JWT_KEY,
-                        { expiresIn: 60 }
+                        { expiresIn: '1hr' }
                     );
 
                     // Generating refresh token
@@ -150,7 +150,7 @@ async function refresh(req, res) {
                     email: decoded.email
                 },
                 process.env.JWT_KEY,
-                { expiresIn: 60 }
+                { expiresIn: '1hr' }
             );;
 
             return res.status(201).json({ success: true, accessToken });
