@@ -1,6 +1,6 @@
-function validateEmployeeData(data, res, next) {
+function validateAddEmployeeData(req, res, next) {
 
-    const { eid, name, age, gender, skills, designation } = data;
+    const { eid, name, age, gender, skills, designation } = req.body;
     const errors = [];
 
     if (!eid || typeof eid !== 'number') {
@@ -22,7 +22,7 @@ function validateEmployeeData(data, res, next) {
         errors.push('Gender is a mandatory field and must be of type string.\n Accepted Values: \'Male\', \'Female\' & \'Other\'');
     }
 
-    if (skills.length > 0) {
+    if (skills && skills.length > 0) {
         skills.forEach((skill) => {
             if (typeof skill !== 'string') {
                 errors.push('Skills must be of type string');
@@ -35,7 +35,10 @@ function validateEmployeeData(data, res, next) {
         errors.push('Designation is a mandatory field and must be of type string');
     }
 
-    return errors;
+    if (errors.length !== 0) {
+        return res.status(400).json({ success: false, error: errors });
+    }
+    next();
 }
 
-module.exports = { validateEmployeeData };
+module.exports = { validateAddEmployeeData };
