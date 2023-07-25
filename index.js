@@ -8,6 +8,8 @@ const { logRequest } = require('./middleware/logRequest');
 const { validatePassword } = require('./middleware/passwordValidator');
 const app = express();
 const cookieParser = require('cookie-parser');
+const { validateAddEmployeeData } = require('./middleware/validateAddEmployeeData');
+const { validateUpdateEmployeeData } = require('./middleware/validateUpdateEmployeeData');
 
 // Connect to MongoDB
 connectDB();
@@ -18,8 +20,14 @@ app.use(express.json());
 // To parse the cookies when the refresh endpoint is hit
 app.use(cookieParser());
 
-//Middleware to log request to before it's handled (i.e. sent to the actual endpoint) 
+// Middleware to log request to before it's handled (i.e. sent to the actual endpoint) 
 app.use('/', logRequest);
+
+// Middleware to validate employee data before adding employee
+app.use('/employees/add', validateAddEmployeeData);
+
+// Middleware to validate employee data before updating employee
+app.use('/employees/update', validateUpdateEmployeeData);
 
 //Middleware to validate password 
 app.use('/users/signUp', validatePassword);
