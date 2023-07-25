@@ -7,7 +7,7 @@ async function addEmployee(req, res) {
     // Checking if existing employee
     const existingEmployee = await Employee.findOne({ "name": req.body.name });
     if (existingEmployee) {
-      res.status(409).json({ success: false, message: "Employee already registered with given email id" });
+      res.status(409).json({ success: false, message: "Employee already registered with the given name" });
     }
     else {
       const employee = await Employee.create(req.body);
