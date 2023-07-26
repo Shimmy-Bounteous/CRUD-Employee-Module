@@ -23,15 +23,6 @@ app.use(cookieParser());
 // Middleware to log request to before it's handled (i.e. sent to the actual endpoint) 
 app.use('/', logRequest);
 
-// Middleware to validate employee data before adding employee
-app.use('/employees/add', validateAddEmployeeData);
-
-// Middleware to validate employee data before updating employee
-app.use('/employees/update', validateUpdateEmployeeData);
-
-//Middleware to validate password 
-app.use('/users/signUp', validatePassword);
-
 // Routes
 app.use('/employees', employeeRoutes);
 app.use('/users', userRoutes);
