@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
+//Middleware to validate password 
+const { validatePassword } = require('../middleware/passwordValidator');
+
 const {
     signUp,
     login,
@@ -9,7 +12,7 @@ const {
     refresh
 } = require('../controllers/authController');
 
-router.post("/signUp", signUp);
+router.post("/signUp", validatePassword, signUp);
 router.post("/login", login);
 router.get("/get", getAllUsers);
 router.delete("/delete/:userId", deleteUser);
